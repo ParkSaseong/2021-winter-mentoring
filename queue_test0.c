@@ -6,4 +6,6 @@ int main() {
 
     bool res = queue_dequeue(q);
     assert(res == false);
+
+    puts("queue test0 pass");
 }
