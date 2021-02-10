@@ -8,8 +8,8 @@ queue *queue_alloc(int capacity) {
     queue *Q = malloc(sizeof(queue));
     Q->body = malloc(sizeof(int)*capacity);
     Q->capacity = capacity;
-    Q->front = -1;
-    Q->rear = -1;
+    Q->front = 0;
+    Q->rear = 0;
     return Q;
 }
 
@@ -43,19 +43,35 @@ bool queue_is_full(queue *this) {
 */
 bool queue_expand(queue *this) {
     if (queue_is_full(this)) {
-        int array[this->capacity];
-        for (int i=0; i<this->capacity; i++) {
-            array[i] = *queue_front(this);
-            this->front = (++this->front%this->capacity);
+        /*
+        int *buf = malloc(sizeof(int)*this->capacity);
+        for (int i=0; i<this->capacity-1; i++) {
+            buf[i] = this->body[(this->front++)%this->capacity];
         }
-        for (int i=0; i<this->capacity; i++) {
-            this->body[i] = array[i];
-        }
-        this->front = -1;
-        this->rear = this->capacity-1;
-
         this->body = realloc(this->body, sizeof(int)*this->capacity*2);
+        int cap = this->capacity;
         this->capacity = this->capacity * 2;
+
+        this->front = 0;
+        this->rear = 0;
+        for (int i=0; i<cap-1; i++) {
+          queue_enqueue(this, buf[i]);
+        }
+        free(buf);
+        */
+       
+        int *new_body = malloc(sizeof(int) * this->capacity);
+        int i = 0;
+        while (!queue_is_empty(this)) {
+            new_body[++i] = *queue_front(this);
+            queue_dequeue(this);
+        }
+        free(this->body);
+        this->body = realloc(new_body, this->capacity * 2 * sizeof(int));
+        this->front = 0;
+        this->rear = this->capacity - 1;
+        this->capacity = this->capacity * 2;
+        
         return true;
     }
     return false;
@@ -84,7 +100,10 @@ bool queue_enqueue(queue *this, int elem) {
     실패시 NULL을 리턴한다.
 */
 int *queue_front(queue *this) {
-    return &(this->body[this->front]);
+    if (queue_is_empty(this)) {
+        return NULL;
+    }
+    return &this->body[(this->front + 1) % this->capacity];
 }
 
 /*
@@ -97,6 +116,8 @@ bool queue_dequeue(queue *this) {
     if (queue_is_empty(this)) {
         return false;
     }
-    this->body[this->front++] = 0;
+
+    this->front = (this->front+1) % this->capacity;
+    this->body[this->front%this->capacity] = 0;
     return true;
 }
