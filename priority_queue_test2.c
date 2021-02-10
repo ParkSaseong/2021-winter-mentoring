@@ -17,12 +17,12 @@ int main() {
     pq_enqueue(pq, 10);
     
     
-    int should = 1;
+    int should = 10;
     while (!pq_is_empty(pq)) {
         int elem = *pq_top(pq);
         pq_dequeue(pq);
         assert(should == elem);
-        should ++;
+        should --;
     }
 
     puts("test 2 pass");
