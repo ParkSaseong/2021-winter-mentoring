@@ -2,7 +2,7 @@
 #include <assert.h>
 
 int main() {
-    queue *q = queue_alloc(1);
+    queue *q = queue_alloc(2);
     int *res;
 
     queue_enqueue(q, 10);
